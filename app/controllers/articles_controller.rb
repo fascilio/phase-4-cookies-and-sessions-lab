@@ -6,9 +6,21 @@ class ArticlesController < ApplicationController
     render json: articles, each_serializer: ArticleListSerializer
   end
 
+  # def show
+  #   article = Article.find(params[:id])
+  #   render json: article
+  # end
+  
   def show
-    article = Article.find(params[:id])
-    render json: article
+    session[:page_views] ||= 0
+    session[:page_views] += 1
+  
+    if session[:page_views] <= 3
+      article = Article.find(params[:id])
+      render json: article
+    else
+      render json: { error: 'Unauthorized - Paywall reached' }, status: 401
+    end
   end
 
   private
